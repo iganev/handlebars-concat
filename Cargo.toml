@@ -1,0 +1,25 @@
+[package]
+name = "handlebars-concat"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.72.1"
+authors = ["Ivan Ganev <iganev@cytec.bg>"]
+description = "Handlebars string, array and object concatenator helper."
+keywords = ["handlebars", "helper", "concat", "implode", "join"]
+categories = ["template-engine", "web-programming", "value-formatting", "text-processing"]
+homepage = "https://github.com/iganev/handlebars-concat"
+repository = "https://github.com/iganev/handlebars-concat"
+documentation = "https://docs.rs/crate/handlebars-concat/"
+readme = "README.md"
+license = "BSD-2-Clause"
+
+[lib]
+name = "handlebars_concat"
+path = "src/lib.rs"
+
+[dependencies]
+handlebars = { version = "^4" }
+serde_json = { version = "^1" }
+
+[badges]
+maintenance = { status = "actively-developed" }
