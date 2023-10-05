@@ -150,10 +150,10 @@ impl HelperDef for HandlebarsConcat {
                                 .map(|t| t.render(r, &context, &mut render_context, &mut content))
                                 .unwrap_or(Ok(()))?;
 
-                            if let Some(out) = content.into_string().ok() {
+                            if let Ok(out) = content.into_string() {
                                 let result = if quotes { format!("\"{}\"", out) } else { out };
 
-                                if result.len() > 0 && (!output.contains(&result) || !distinct) {
+                                if !result.is_empty() && (!output.contains(&result) || !distinct) {
                                     output.push(result);
                                 }
                             }
@@ -163,8 +163,7 @@ impl HelperDef for HandlebarsConcat {
 
                         output.append(
                             &mut o
-                                .keys()
-                                .map(|item| item.clone())
+                                .keys().cloned()
                                 .map(|item| {
                                     if quotes {
                                         format!("\"{}\"", item)
@@ -186,7 +185,7 @@ impl HelperDef for HandlebarsConcat {
             }
         }
 
-        out.write(&*output.join(&*separator))?;
+        out.write(&output.join(&*separator))?;
 
         Ok(())
     }

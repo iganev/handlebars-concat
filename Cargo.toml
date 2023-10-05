@@ -1,6 +1,6 @@
 [package]
 name = "handlebars-concat"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.72.1"
 authors = ["Ivan Ganev <iganev@cytec.bg>"]
