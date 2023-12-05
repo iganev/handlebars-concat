@@ -15,7 +15,6 @@ Developed and tested with handlebars-rust v4.4.0.
 ```rust
     use handlebars::Handlebars;
     use handlebars_concat::HandlebarsConcat;
-    use serde_json::json;
     
     let mut h = Handlebars::new();
     h.register_helper("concat", Box::new(HandlebarsConcat));
