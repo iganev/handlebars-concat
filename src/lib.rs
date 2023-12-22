@@ -106,7 +106,15 @@ impl HelperDef for HandlebarsConcat {
         let quotes = h.hash_get("quotes").is_some();
         let single_quote = h.hash_get("single_quote").is_some(); // as a modifier on top of "quotes", switches to single quotation
 
-        let quotation_mark = if quotes { if single_quote { QUOTES_SINGLE } else { QUOTES_DOUBLE } } else { "" };
+        let quotation_mark = if quotes {
+            if single_quote {
+                QUOTES_SINGLE
+            } else {
+                QUOTES_DOUBLE
+            }
+        } else {
+            ""
+        };
 
         let template = h.template();
 
@@ -165,7 +173,11 @@ impl HelperDef for HandlebarsConcat {
                                 .unwrap_or(Ok(()))?;
 
                             if let Ok(out) = content.into_string() {
-                                let result = if quotes { format!("{}{}{}", quotation_mark, out, quotation_mark) } else { out };
+                                let result = if quotes {
+                                    format!("{}{}{}", quotation_mark, out, quotation_mark)
+                                } else {
+                                    out
+                                };
 
                                 if !result.is_empty() && (!output.contains(&result) || !distinct) {
                                     output.push(result);
@@ -177,7 +189,8 @@ impl HelperDef for HandlebarsConcat {
 
                         output.append(
                             &mut o
-                                .keys().cloned()
+                                .keys()
+                                .cloned()
                                 .map(|item| {
                                     if quotes {
                                         format!("{}{}{}", quotation_mark, item, quotation_mark)
@@ -243,7 +256,7 @@ mod tests {
                 r#"{{concat "One" "Two" separator=", " quotes=true single_quote=true}}"#,
                 &String::new()
             )
-                .expect("Render error"),
+            .expect("Render error"),
             r#"'One', 'Two'"#,
             "Failed to concat literals with separator and single quotation marks"
         );
