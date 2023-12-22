@@ -3,6 +3,9 @@ use handlebars::{
     Renderable, StringOutput,
 };
 
+const QUOTES_DOUBLE: &str = "\"";
+const QUOTES_SINGLE: &str = "\'";
+
 #[derive(Clone, Copy)]
 /// Inflector helper for handlebars-rust
 ///
@@ -37,6 +40,7 @@ use handlebars::{
 /// * separator: Set specific string to join elements with. Default is ","
 /// * distinct: Eliminate duplicates upon adding to output buffer
 /// * quotes: Wrap each value in double quotation marks
+/// * single_quote: Modifier of `quotes` to switch to single quotation mark instead
 ///
 /// # Example usage:
 ///
@@ -54,6 +58,13 @@ use handlebars::{
 /// `
 ///
 /// Result: "One", "Two"
+///
+///
+/// `
+/// {{concat "One" "Two" separator=", " quotes=true single_quote=true}}
+/// `
+///
+/// Result: 'One', 'Two'
 ///
 ///
 /// * Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"Three":3}`
@@ -93,6 +104,9 @@ impl HelperDef for HandlebarsConcat {
         let distinct = h.hash_get("distinct").is_some();
 
         let quotes = h.hash_get("quotes").is_some();
+        let single_quote = h.hash_get("single_quote").is_some(); // as a modifier on top of "quotes", switches to single quotation
+
+        let quotation_mark = if quotes { if single_quote { QUOTES_SINGLE } else { QUOTES_DOUBLE } } else { "" };
 
         let template = h.template();
 
@@ -105,7 +119,7 @@ impl HelperDef for HandlebarsConcat {
                 let mut value = param.value().render();
 
                 if quotes {
-                    value = format!("\"{}\"", value);
+                    value = format!("{}{}{}", quotation_mark, value, quotation_mark);
                 }
 
                 if !output.contains(&value) || !distinct {
@@ -119,7 +133,7 @@ impl HelperDef for HandlebarsConcat {
                             .map(|item| item.render())
                             .map(|item| {
                                 if quotes {
-                                    format!("\"{}\"", item)
+                                    format!("{}{}{}", quotation_mark, item, quotation_mark)
                                 } else {
                                     item
                                 }
@@ -151,7 +165,7 @@ impl HelperDef for HandlebarsConcat {
                                 .unwrap_or(Ok(()))?;
 
                             if let Ok(out) = content.into_string() {
-                                let result = if quotes { format!("\"{}\"", out) } else { out };
+                                let result = if quotes { format!("{}{}{}", quotation_mark, out, quotation_mark) } else { out };
 
                                 if !result.is_empty() && (!output.contains(&result) || !distinct) {
                                     output.push(result);
@@ -166,7 +180,7 @@ impl HelperDef for HandlebarsConcat {
                                 .keys().cloned()
                                 .map(|item| {
                                     if quotes {
-                                        format!("\"{}\"", item)
+                                        format!("{}{}{}", quotation_mark, item, quotation_mark)
                                     } else {
                                         item
                                     }
@@ -223,6 +237,15 @@ mod tests {
             .expect("Render error"),
             r#""One", "Two""#,
             "Failed to concat literals with separator and quotes"
+        );
+        assert_eq!(
+            h.render_template(
+                r#"{{concat "One" "Two" separator=", " quotes=true single_quote=true}}"#,
+                &String::new()
+            )
+                .expect("Render error"),
+            r#"'One', 'Two'"#,
+            "Failed to concat literals with separator and single quotation marks"
         );
         assert_eq!(
             h.render_template(
