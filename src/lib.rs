@@ -262,6 +262,15 @@ mod tests {
         );
         assert_eq!(
             h.render_template(
+                r#"{{concat s arr obj separator=", " quotes=true}}"#,
+                &json!({"arr": ["One", "Two", "Three"]})
+            )
+            .expect("Render error"),
+            r#""One", "Two", "Three""#,
+            "Failed to concat array with quotes"
+        );
+        assert_eq!(
+            h.render_template(
                 r#"{{concat s arr obj separator=", " distinct=true}}"#,
                 &json!({"s": "One", "arr": ["One", "Two"], "obj": {"Three":3}})
             )
