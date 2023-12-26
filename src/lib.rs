@@ -286,5 +286,13 @@ mod tests {
             "One, Two, Three, Four",
             "Failed to concat literal, array and object using block template"
         );
+        assert_eq!(
+            h.render_template(
+                r#"{{#concat s arr obj separator=", " distinct=true quotes=true}}{{label}}{{/concat}}"#,
+                &json!({"s": "One", "arr": ["One", "Two"], "obj": {"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}})
+            ).expect("Render error"),
+            r#""One", "Two", "Three", "Four""#,
+            "Failed to concat literal, array and object using block template"
+        );
     }
 }
