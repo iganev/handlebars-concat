@@ -294,5 +294,13 @@ mod tests {
             r#""One", "Two", "Three", "Four""#,
             "Failed to concat literal, array and object using block template"
         );
+        assert_eq!(
+            h.render_template(
+                r#"{{concat obj separator=", " quotes=true}}"#,
+                &json!({"obj": {"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}})
+            ).expect("Render error"),
+            r#""key0", "key1", "key2""#,
+            "Failed to concat object keys with quotation marks and no distinction"
+        );
     }
 }
