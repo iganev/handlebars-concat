@@ -41,6 +41,7 @@ const QUOTES_SINGLE: &str = "\'";
 /// * distinct: Eliminate duplicates upon adding to output buffer
 /// * quotes: Wrap each value in double quotation marks
 /// * single_quote: Modifier of `quotes` to switch to single quotation mark instead
+/// * render_all: Render all values using the block template, not just object values
 ///
 /// # Example usage:
 ///
@@ -84,6 +85,15 @@ const QUOTES_SINGLE: &str = "\'";
 ///
 /// Result: One, Two, Three, Four
 ///
+///
+/// * Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`
+///
+/// `
+/// {{#concat s arr obj separator=", " distinct=true render_all=true}}<{{#if label}}{{label}}{{else}}{{this}}{{/if}}/>{{/concat}}
+/// `
+///
+/// Result: <One/>, <Two/>, <Three/>, <Four/>
+///
 pub struct HandlebarsConcat;
 
 impl HelperDef for HandlebarsConcat {
@@ -116,6 +126,8 @@ impl HelperDef for HandlebarsConcat {
             ""
         };
 
+        let render_all = h.hash_get("render_all").is_some(); // force all values through the block template
+
         let template = h.template();
 
         let mut output: Vec<String> = Vec::new();
@@ -124,37 +136,91 @@ impl HelperDef for HandlebarsConcat {
             let param = param.clone();
 
             if param.value().is_string() {
-                let mut value = param.value().render();
+                if h.is_block() && render_all {
+                    // use block template to render strings
 
-                if quotes {
-                    value = format!("{}{}{}", quotation_mark, value, quotation_mark);
-                }
+                    let mut content = StringOutput::default();
 
-                if !output.contains(&value) || !distinct {
-                    output.push(value);
+                    let context_data = param.value().clone();
+                    let context = Context::from(context_data);
+                    let mut render_context = RenderContext::new(None);
+
+                    template
+                        .map(|t| t.render(r, &context, &mut render_context, &mut content))
+                        .unwrap_or(Ok(()))?;
+
+                    if let Ok(out) = content.into_string() {
+                        let result = if quotes {
+                            format!("{}{}{}", quotation_mark, out, quotation_mark)
+                        } else {
+                            out
+                        };
+
+                        if !result.is_empty() && (!output.contains(&result) || !distinct) {
+                            output.push(result);
+                        }
+                    }
+                } else {
+                    let mut value = param.value().render();
+
+                    if quotes {
+                        value = format!("{}{}{}", quotation_mark, value, quotation_mark);
+                    }
+
+                    if !output.contains(&value) || !distinct {
+                        output.push(value);
+                    }
                 }
             } else if param.value().is_array() {
                 if let Some(ar) = param.value().as_array() {
-                    output.append(
-                        &mut ar
-                            .iter()
-                            .map(|item| item.render())
-                            .map(|item| {
-                                if quotes {
-                                    format!("{}{}{}", quotation_mark, item, quotation_mark)
+                    if h.is_block() && render_all {
+                        // use block template to render array elements
+
+                        for array_item in ar {
+                            let mut content = StringOutput::default();
+
+                            let context_data = array_item.clone();
+                            let context = Context::from(context_data);
+                            let mut render_context = RenderContext::new(None);
+
+                            template
+                                .map(|t| t.render(r, &context, &mut render_context, &mut content))
+                                .unwrap_or(Ok(()))?;
+
+                            if let Ok(out) = content.into_string() {
+                                let result = if quotes {
+                                    format!("{}{}{}", quotation_mark, out, quotation_mark)
                                 } else {
-                                    item
+                                    out
+                                };
+
+                                if !result.is_empty() && (!output.contains(&result) || !distinct) {
+                                    output.push(result);
                                 }
-                            })
-                            .filter(|item| {
-                                if distinct {
-                                    !output.contains(item)
-                                } else {
-                                    true
-                                }
-                            })
-                            .collect::<Vec<String>>(),
-                    );
+                            }
+                        }
+                    } else {
+                        output.append(
+                            &mut ar
+                                .iter()
+                                .map(|item| item.render())
+                                .map(|item| {
+                                    if quotes {
+                                        format!("{}{}{}", quotation_mark, item, quotation_mark)
+                                    } else {
+                                        item
+                                    }
+                                })
+                                .filter(|item| {
+                                    if distinct {
+                                        !output.contains(item)
+                                    } else {
+                                        true
+                                    }
+                                })
+                                .collect::<Vec<String>>(),
+                        );
+                    }
                 }
             } else if param.value().is_object() {
                 if let Some(o) = param.value().as_object() {
@@ -301,6 +367,14 @@ mod tests {
             ).expect("Render error"),
             r#""key0", "key1", "key2""#,
             "Failed to concat object keys with quotation marks and no distinction"
+        );
+        assert_eq!(
+            h.render_template(
+                r#"{{#concat s arr obj separator=", " distinct=true render_all=true}}<{{#if label}}{{label}}{{else}}{{this}}{{/if}}/>{{/concat}}"#,
+                &json!({"s": "One", "arr": ["One", "Two"], "obj": {"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}})
+            ).expect("Render error"),
+            r#"<One/>, <Two/>, <Three/>, <Four/>"#,
+            "Failed to concat literal, array and object using block template"
         );
     }
 }
