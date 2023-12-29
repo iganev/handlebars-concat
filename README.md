@@ -34,6 +34,8 @@ The helper accepts several hash arguments to modify the concatenation behavior:
 - separator: Set specific string to join elements with. Default is ","
 - distinct: Eliminate duplicates upon adding to output buffer
 - quotes: Wrap each value in double quotation marks
+- single_quote: Modifier of `quotes` to switch to single quotation mark instead
+- render_all: Render all values using the block template, not just object values
 
 Example with string literals:
 
@@ -60,6 +62,14 @@ Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"
 ```
 
 Result: One, Two, Three, Four
+
+Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`
+
+```handlebars
+{{#concat s arr obj separator=", " distinct=true render_all=true}}<{{#if label}}{{label}}{{else}}{{this}}{{/if}}/>{{/concat}}
+```
+
+Result: `<One/>, <Two/>, <Three/>, <Four/>`
 
 ## License
 
