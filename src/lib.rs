@@ -26,8 +26,9 @@ const QUOTES_SINGLE: &str = "\'";
 ///
 /// # Arguments
 ///
-/// Multiple mixed-type arguments are accepted. Any combination of types in any possible order is
-/// allowed.
+/// The helper is looking for multiple arguments of type string, array or object. Arguments are being added to an output buffer and returned altogether as string.
+///
+/// The helper has few parameters modifying the behavior slightly. For example `distinct=true` eliminates duplicate values from the output buffer, while `quotes=true` in combination with `single_quote=true` wraps the values in quotation marks.
 ///
 /// * String arguments are concatenated without any additional operations (except the optional quotation)
 /// * Array arguments are iterated and each array value is treated as a separate string argument
