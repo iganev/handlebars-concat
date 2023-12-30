@@ -22,7 +22,9 @@ Developed and tested with handlebars-rust v4.4.0.
 
 ### Behavior
 
-The helper is looking for multiple arguments of type string, array or object.  
+The helper is looking for multiple arguments of type string, array or object. Arguments are being added to an output buffer and returned altogether as string.   
+
+The helper has few parameters modifying the behavior slightly. For example `distinct=true` eliminates duplicate values from the output buffer, while `quotes=true` in combination with `single_quote=true` wraps the values in quotation marks. See [Parameters](#parameters) for more. 
 
 #### String
 ~~String arguments are added directly to the output buffer.~~  
