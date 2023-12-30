@@ -20,22 +20,44 @@ Developed and tested with handlebars-rust v4.4.0.
     h.register_helper("concat", Box::new(HandlebarsConcat));
 ```
 
-### Usage
+### Behavior
 
-The helper is looking for multiple arguments of type string, array or object.
-- String arguments are added directly to the output buffer.
-- Array arguments are iterated and added as individual strings to the output buffer.
-- Object arguments could be handled two different ways:
+The helper is looking for multiple arguments of type string, array or object.  
+
+#### String
+~~String arguments are added directly to the output buffer.~~  
+As of `0.1.3` strings could be handled in one of two ways:
+1. By default strings are added to the output buffer without modification (other than the quotation mark modifiers).
+2. If you add a block template and use the `render_all` parameter, strings will be passed as `{{this}}` to the block template.  
+
+The block template rendering is disabled by default for backward compatibility.
+
+#### Array
+~~Array arguments are iterated and added as individual strings to the output buffer.~~  
+As of `0.1.3` arrays could be handled in one of two ways:
+1. By default array values are added as individual strings to the output buffer without modification (other than the quotation mark modifiers).
+2. If you add a block template and use the `render_all` parameter, array values are passed as `{{this}}` to the block template.  
+
+The block template rendering is disabled by default for backward compatibility.
+
+#### Object
+Object arguments could be handled two different ways:
 1. By default only the object keys are being used and the values are ignored.
 2. If you add a block template the helper will use it to render the object value and  
 concatenate it as string to the output buffer.
 
+Object rendering results are subject to `distinct`, `quotes` and `single_quote` modifier parameters, just like strings and arrays.  
+
+### Parameters
+
 The helper accepts several hash arguments to modify the concatenation behavior:
-- separator: Set specific string to join elements with. Default is ","
-- distinct: Eliminate duplicates upon adding to output buffer
-- quotes: Wrap each value in double quotation marks
-- single_quote: Modifier of `quotes` to switch to single quotation mark instead
-- render_all: Render all values using the block template, not just object values
+- `separator`: Set specific string to join elements with. Default is ","
+- `distinct`: Eliminate duplicates upon adding to output buffer
+- `quotes`: Wrap each value in double quotation marks
+- `single_quote`: Modifier of `quotes` to switch to single quotation mark instead
+- `render_all`: Render all values using the block template, not just object values
+
+### Examples
 
 Example with string literals:
 
