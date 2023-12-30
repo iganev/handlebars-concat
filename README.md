@@ -67,9 +67,17 @@ Example with string literals:
 {{concat "One" "Two" separator=", "}}
 ```
 
+Result: `One, Two`
+
+---
+
 ```handlebars
 {{concat "One" "Two" separator=", " quotes=true}}
 ```
+
+Result: `"One", "Two"`
+
+---
 
 Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"Three":3}`
 
@@ -77,7 +85,9 @@ Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"Three":3}`
 {{concat s arr obj separator=", " distinct=true}}
 ```
 
-Result: One, Two, Three
+Result: `One, Two, Three`
+
+---
 
 Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`:
 
@@ -85,7 +95,9 @@ Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"
 {{#concat s arr obj separator=", " distinct=true}}{{label}}{{/concat}}
 ```
 
-Result: One, Two, Three, Four
+Result: `One, Two, Three, Four`
+
+---
 
 Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`
 
@@ -94,6 +106,8 @@ Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"
 ```
 
 Result: `<One/>, <Two/>, <Three/>, <Four/>`
+
+---
 
 ## License
 
