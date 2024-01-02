@@ -7,11 +7,11 @@ const QUOTES_DOUBLE: &str = "\"";
 const QUOTES_SINGLE: &str = "\'";
 
 #[derive(Clone, Copy)]
-/// Inflector helper for handlebars-rust
+/// Concat helper for handlebars-rust
 ///
 /// # Registration
 ///
-/// ```
+/// ```rust
 /// use handlebars::Handlebars;
 /// use handlebars_concat::HandlebarsConcat;
 /// use serde_json::json;
@@ -22,19 +22,38 @@ const QUOTES_SINGLE: &str = "\'";
 /// assert_eq!(h.render_template(r#"{{concat item1 item2}}"#, &json!({"item1": "Value 1", "item2": "Value 2"})).expect("Render error"), "Value 1,Value 2");
 /// assert_eq!(h.render_template(r#"{{concat this separator=", "}}"#, &json!({"item1": "Value 1", "item2": "Value 2"})).expect("Render error"), "item1, item2");
 /// assert_eq!(h.render_template(r#"{{#concat this separator=", "}}{{this}}{{/concat}}"#, &json!({"item1": "Value 1", "item2": "Value 2"})).expect("Render error"), "Value 1, Value 2");
+/// assert_eq!(h.render_template(r#"{{#concat "Form" this separator="" render_all=true}}<{{#if tag}}{{tag}}{{else}}{{this}}{{/if}}/>{{/concat}}"#, &json!({"key0":{"tag":"Input"},"key1":{"tag":"Select"},"key2":{"tag":"Button"}})).expect("Render error"), "<Form/><Input/><Select/><Button/>");
 /// ```
 ///
-/// # Arguments
+/// # Behavior
 ///
 /// The helper is looking for multiple arguments of type string, array or object. Arguments are being added to an output buffer and returned altogether as string.
 ///
 /// The helper has few parameters modifying the behavior slightly. For example `distinct=true` eliminates duplicate values from the output buffer, while `quotes=true` in combination with `single_quote=true` wraps the values in quotation marks.
 ///
-/// * String arguments are concatenated without any additional operations (except the optional quotation)
-/// * Array arguments are iterated and each array value is treated as a separate string argument
-/// * Object arguments have only their keys used for concatenation by default. If the helper is used
-/// with a template block then objects values are being rendered using the template block before
-/// being treated as strings and concatenated to the rest of the output.
+/// ## String
+/// ~~String arguments are added directly to the output buffer.~~
+/// As of `0.1.3` strings could be handled in one of two ways:
+/// 1. By default strings are added to the output buffer without modification (other than the quotation mark modifiers).
+/// 2. If you add a block template and use the `render_all` parameter, strings will be passed as `{{this}}` to the block template.
+///
+/// The block template rendering is disabled by default for backward compatibility.
+///
+/// ## Array
+/// ~~Array arguments are iterated and added as individual strings to the output buffer.~~
+/// As of `0.1.3` arrays could be handled in one of two ways:
+/// 1. By default array values are added as individual strings to the output buffer without modification (other than the quotation mark modifiers).
+/// 2. If you add a block template and use the `render_all` parameter, array values are passed as `{{this}}` to the block template.
+///
+/// The block template rendering is disabled by default for backward compatibility.
+///
+/// ## Object
+/// Object arguments could be handled two different ways:
+/// 1. By default only the object keys are being used and the values are ignored.
+/// 2. If you add a block template the helper will use it to render the object value and
+/// concatenate it as string to the output buffer.
+///
+/// Object rendering results are subject to `distinct`, `quotes` and `single_quote` modifier parameters, just like strings and arrays.
 ///
 /// # Hash parameters
 ///
@@ -46,54 +65,54 @@ const QUOTES_SINGLE: &str = "\'";
 ///
 /// # Example usage:
 ///
-/// * Using literals:
 ///
-/// `
+/// Example with string literals:
+///
+/// ```handlebars
 /// {{concat "One" "Two" separator=", "}}
-/// `
+/// ```
 ///
-/// Result: One, Two
+/// Result: `One, Two`
 ///
+/// ---
 ///
-/// `
+/// ```handlebars
 /// {{concat "One" "Two" separator=", " quotes=true}}
-/// `
+/// ```
 ///
-/// Result: "One", "Two"
+/// Result: `"One", "Two"`
 ///
+/// ---
 ///
-/// `
-/// {{concat "One" "Two" separator=", " quotes=true single_quote=true}}
-/// `
+/// Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"Three":3}`
 ///
-/// Result: 'One', 'Two'
-///
-///
-/// * Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"Three":3}`
-///
-/// `
+/// ```handlebars
 /// {{concat s arr obj separator=", " distinct=true}}
-/// `
+/// ```
 ///
-/// Result: One, Two, Three
+/// Result: `One, Two, Three`
 ///
+/// ---
 ///
-/// * Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`
+/// Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`:
 ///
-/// `
+/// ```handlebars
 /// {{#concat s arr obj separator=", " distinct=true}}{{label}}{{/concat}}
-/// `
+/// ```
 ///
-/// Result: One, Two, Three, Four
+/// Result: `One, Two, Three, Four`
 ///
+/// ---
 ///
-/// * Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`
+/// Where `s` is `"One"`, `arr` is `["One", "Two"]` and `obj` is `{"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}`
 ///
-/// `
+/// ```handlebars
 /// {{#concat s arr obj separator=", " distinct=true render_all=true}}<{{#if label}}{{label}}{{else}}{{this}}{{/if}}/>{{/concat}}
-/// `
+/// ```
 ///
-/// Result: <One/>, <Two/>, <Three/>, <Four/>
+/// Result: `<One/>, <Two/>, <Three/>, <Four/>`
+///
+/// ---
 ///
 pub struct HandlebarsConcat;
 
