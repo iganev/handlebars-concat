@@ -1,6 +1,6 @@
 [package]
 name = "handlebars-concat"
-version = "0.1.4"
+version = "0.2.0"
 edition = "2021"
 authors = ["Ivan Ganev <iganev@cytec.bg>"]
 description = "Handlebars string, array and object concatenator helper."
