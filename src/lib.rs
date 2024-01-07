@@ -119,7 +119,7 @@ pub struct HandlebarsConcat;
 impl HelperDef for HandlebarsConcat {
     fn call<'reg: 'rc, 'rc>(
         &self,
-        h: &Helper<'reg, 'rc>,
+        h: &Helper<'rc>,
         r: &'reg Handlebars,
         _ctx: &'rc Context,
         _rc: &mut RenderContext<'reg, 'rc>,
