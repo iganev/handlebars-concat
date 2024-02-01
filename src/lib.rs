@@ -1,10 +1,20 @@
-use handlebars::{
-    Context, Handlebars, Helper, HelperDef, HelperResult, JsonRender, Output, RenderContext,
-    Renderable, StringOutput,
-};
+use handlebars::{Context, Handlebars, Helper, HelperDef, HelperResult, JsonRender, Output, RenderContext, Renderable, StringOutput, PathAndJson, BlockContext, ScopedJson};
 
 const QUOTES_DOUBLE: &str = "\"";
 const QUOTES_SINGLE: &str = "\'";
+
+pub(crate) fn create_block<'rc>(param: &PathAndJson<'rc>) -> BlockContext<'rc> {
+    let mut block = BlockContext::new();
+
+    if let Some(new_path) = param.context_path() {
+        *block.base_path_mut() = new_path.clone();
+    } else {
+        // use clone for now
+        block.set_base_value(param.value().clone());
+    }
+
+    block
+}
 
 #[derive(Clone, Copy)]
 /// Concat helper for handlebars-rust
@@ -121,8 +131,8 @@ impl HelperDef for HandlebarsConcat {
         &self,
         h: &Helper<'rc>,
         r: &'reg Handlebars,
-        _ctx: &'rc Context,
-        _rc: &mut RenderContext<'reg, 'rc>,
+        ctx: &'rc Context,
+        rc: &mut RenderContext<'reg, 'rc>,
         out: &mut dyn Output,
     ) -> HelperResult {
         let separator = if let Some(s) = h.hash_get("separator") {
@@ -161,13 +171,14 @@ impl HelperDef for HandlebarsConcat {
 
                     let mut content = StringOutput::default();
 
-                    let context_data = param.value().clone();
-                    let context = Context::from(context_data);
-                    let mut render_context = RenderContext::new(None);
+                    let block = create_block(&param);
+                    rc.push_block(block);
 
                     template
-                        .map(|t| t.render(r, &context, &mut render_context, &mut content))
+                        .map(|t| t.render(r, ctx, rc, &mut content))
                         .unwrap_or(Ok(()))?;
+
+                    rc.pop_block();
 
                     if let Ok(out) = content.into_string() {
                         let result = if quotes {
@@ -199,13 +210,14 @@ impl HelperDef for HandlebarsConcat {
                         for array_item in ar {
                             let mut content = StringOutput::default();
 
-                            let context_data = array_item.clone();
-                            let context = Context::from(context_data);
-                            let mut render_context = RenderContext::new(None);
+                            let block = create_block(&PathAndJson::new(None, ScopedJson::from(array_item.clone())));
+                            rc.push_block(block);
 
                             template
-                                .map(|t| t.render(r, &context, &mut render_context, &mut content))
+                                .map(|t| t.render(r, ctx, rc, &mut content))
                                 .unwrap_or(Ok(()))?;
+
+                            rc.pop_block();
 
                             if let Ok(out) = content.into_string() {
                                 let result = if quotes {
@@ -250,13 +262,14 @@ impl HelperDef for HandlebarsConcat {
                         for obj in o.values() {
                             let mut content = StringOutput::default();
 
-                            let context_data = obj.clone();
-                            let context = Context::from(context_data);
-                            let mut render_context = RenderContext::new(None);
+                            let block = create_block(&PathAndJson::new(None, ScopedJson::from(obj.clone())));
+                            rc.push_block(block);
 
                             template
-                                .map(|t| t.render(r, &context, &mut render_context, &mut content))
+                                .map(|t| t.render(r, ctx, rc, &mut content))
                                 .unwrap_or(Ok(()))?;
+
+                            rc.pop_block();
 
                             if let Ok(out) = content.into_string() {
                                 let result = if quotes {
@@ -402,6 +415,14 @@ mod tests {
                 &json!({"s": "One", "arr": ["One", "Two"], "obj": {"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}})
             ).expect("Render error"),
             r#""[One]", "[Two]", "[Three]", "[Four]""#,
+            "Failed to concat literal, array and object using block template"
+        );
+        assert_eq!(
+            h.render_template(
+                r#"{{#concat s arr obj separator=", " distinct=true render_all=true quotes=true}}[{{#if label}}{{label}}{{else}}{{@root/zero}}{{/if}}]{{/concat}}"#,
+                &json!({"zero":"Zero", "s": "One", "arr": ["One", "Two"], "obj": {"key0":{"label":"Two"},"key1":{"label":"Three"},"key2":{"label":"Four"}}})
+            ).expect("Render error"),
+            r#""[Zero]", "[Two]", "[Three]", "[Four]""#,
             "Failed to concat literal, array and object using block template"
         );
     }
