@@ -3,7 +3,9 @@ use handlebars::{Context, Handlebars, Helper, HelperDef, HelperResult, JsonRende
 const QUOTES_DOUBLE: &str = "\"";
 const QUOTES_SINGLE: &str = "\'";
 
-pub(crate) fn create_block<'rc>(param: &PathAndJson<'rc>) -> BlockContext<'rc> {
+pub(crate) fn create_block<'reg: 'rc, 'rc>(
+    param: &'rc PathAndJson<'reg, 'rc>,
+) -> BlockContext<'reg> {
     let mut block = BlockContext::new();
 
     if let Some(new_path) = param.context_path() {
@@ -129,7 +131,7 @@ pub struct HandlebarsConcat;
 impl HelperDef for HandlebarsConcat {
     fn call<'reg: 'rc, 'rc>(
         &self,
-        h: &Helper<'rc>,
+        h: &Helper<'reg, 'rc>,
         r: &'reg Handlebars,
         ctx: &'rc Context,
         rc: &mut RenderContext<'reg, 'rc>,
@@ -163,7 +165,7 @@ impl HelperDef for HandlebarsConcat {
         let mut output: Vec<String> = Vec::new();
 
         for param in h.params() {
-            let param = param.clone();
+            //let param = param.clone();
 
             if param.value().is_string() {
                 if h.is_block() && render_all {

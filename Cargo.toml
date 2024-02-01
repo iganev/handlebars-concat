@@ -1,6 +1,6 @@
 [package]
 name = "handlebars-concat"
-version = "0.2.1"
+version = "0.1.5"
 edition = "2021"
 authors = ["Ivan Ganev <iganev@cytec.bg>"]
 description = "Handlebars string, array and object concatenator helper."
@@ -17,7 +17,7 @@ name = "handlebars_concat"
 path = "src/lib.rs"
 
 [dependencies]
-handlebars = { version = "^5" }
+handlebars = { version = "^4" }
 serde_json = { version = "^1" }
 
 [badges]
