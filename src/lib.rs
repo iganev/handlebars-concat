@@ -1,4 +1,7 @@
-use handlebars::{Context, Handlebars, Helper, HelperDef, HelperResult, JsonRender, Output, RenderContext, Renderable, StringOutput, PathAndJson, BlockContext, ScopedJson};
+use handlebars::{
+    BlockContext, Context, Handlebars, Helper, HelperDef, HelperResult, JsonRender, Output,
+    PathAndJson, RenderContext, Renderable, ScopedJson, StringOutput,
+};
 
 const QUOTES_DOUBLE: &str = "\"";
 const QUOTES_SINGLE: &str = "\'";
@@ -210,7 +213,10 @@ impl HelperDef for HandlebarsConcat {
                         for array_item in ar {
                             let mut content = StringOutput::default();
 
-                            let block = create_block(&PathAndJson::new(None, ScopedJson::from(array_item.clone())));
+                            let block = create_block(&PathAndJson::new(
+                                None,
+                                ScopedJson::from(array_item.clone()),
+                            ));
                             rc.push_block(block);
 
                             template
@@ -262,7 +268,10 @@ impl HelperDef for HandlebarsConcat {
                         for obj in o.values() {
                             let mut content = StringOutput::default();
 
-                            let block = create_block(&PathAndJson::new(None, ScopedJson::from(obj.clone())));
+                            let block = create_block(&PathAndJson::new(
+                                None,
+                                ScopedJson::from(obj.clone()),
+                            ));
                             rc.push_block(block);
 
                             template
