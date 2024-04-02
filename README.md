@@ -1,7 +1,7 @@
 [![Crates.io](https://img.shields.io/crates/v/handlebars-concat?color=4d76ae)](https://crates.io/crates/handlebars-concat)
 [![API](https://docs.rs/handlebars-concat/badge.svg)](https://docs.rs/handlebars-concat)
 [![dependency status](https://deps.rs/repo/github/iganev/handlebars-concat/status.svg)](https://deps.rs/repo/github/iganev/handlebars-concat)
-[![Build and Test](https://github.com/iganev/handlebars-concat/actions/workflows/rust.yml/badge.svg)](https://github.com/iganev/handlebars-concat/actions/workflows/rust.yml)
+[![build and test](https://github.com/iganev/handlebars-concat/actions/workflows/rust.yml/badge.svg)](https://github.com/iganev/handlebars-concat/actions/workflows/rust.yml)
 [![codecov](https://codecov.io/github/iganev/handlebars-concat/graph/badge.svg?token=B5P2TAV5BB)](https://codecov.io/github/iganev/handlebars-concat)
 
 # handlebars-concat
