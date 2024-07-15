@@ -6,6 +6,7 @@ use handlebars::{
 const QUOTES_DOUBLE: &str = "\"";
 const QUOTES_SINGLE: &str = "\'";
 
+#[allow(clippy::assigning_clones)]
 pub(crate) fn create_block<'rc>(param: &PathAndJson<'rc>) -> BlockContext<'rc> {
     let mut block = BlockContext::new();
 
