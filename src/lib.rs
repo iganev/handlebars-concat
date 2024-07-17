@@ -20,10 +20,6 @@ pub(crate) fn create_block<'rc>(param: &PathAndJson<'rc>) -> BlockContext<'rc> {
     block
 }
 
-pub(crate) fn render_value_string(value: serde_json::Value) -> String {
-    String::new()
-}
-
 #[derive(Clone, Copy)]
 /// Concat helper for handlebars-rust
 ///
