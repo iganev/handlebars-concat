@@ -341,6 +341,12 @@ mod tests {
         h.register_helper("concat", Box::new(HandlebarsConcat));
 
         assert_eq!(
+            h.render_template(r#"{{concat 1 2}}"#, &String::new())
+                .expect("Render error"),
+            "1,2",
+            "Failed to concat numeric literals"
+        );
+        assert_eq!(
             h.render_template(r#"{{concat "One" "Two"}}"#, &String::new())
                 .expect("Render error"),
             "One,Two",
