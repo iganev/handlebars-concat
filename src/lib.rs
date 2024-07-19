@@ -168,47 +168,47 @@ impl HelperDef for HandlebarsConcat {
 
         for param in h.params() {
             match param.value() {
-                serde_json::Value::Null => {},
-                serde_json::Value::Bool(_) |
-                serde_json::Value::Number(_) |
-                serde_json::Value::String(_) => {
+                serde_json::Value::Null => {}
+                serde_json::Value::Bool(_)
+                | serde_json::Value::Number(_)
+                | serde_json::Value::String(_) => {
                     if h.is_block() && render_all {
                         // use block template to render strings
-    
+
                         let mut content = StringOutput::default();
-    
+
                         let block = create_block(&param);
                         rc.push_block(block);
-    
+
                         template
                             .map(|t| t.render(r, ctx, rc, &mut content))
                             .unwrap_or(Ok(()))?;
-    
+
                         rc.pop_block();
-    
+
                         if let Ok(out) = content.into_string() {
                             let result = if quotes {
                                 format!("{}{}{}", quotation_mark, out, quotation_mark)
                             } else {
                                 out
                             };
-    
+
                             if !result.is_empty() && (!output.contains(&result) || !distinct) {
                                 output.push(result);
                             }
                         }
                     } else {
                         let mut value = param.value().render();
-    
+
                         if quotes {
                             value = format!("{}{}{}", quotation_mark, value, quotation_mark);
                         }
-    
+
                         if !output.contains(&value) || !distinct {
                             output.push(value);
                         }
                     }
-                },
+                }
                 serde_json::Value::Array(ar) => {
                     if h.is_block() && render_all {
                         // use block template to render array elements
@@ -262,7 +262,7 @@ impl HelperDef for HandlebarsConcat {
                                 .collect::<Vec<String>>(),
                         );
                     }
-                },
+                }
                 serde_json::Value::Object(o) => {
                     if h.is_block() {
                         // use block template to render objects
@@ -318,7 +318,7 @@ impl HelperDef for HandlebarsConcat {
                                 .collect::<Vec<String>>(),
                         );
                     }
-                },
+                }
             }
         }
 
