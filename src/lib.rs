@@ -20,6 +20,14 @@ pub(crate) fn create_block<'rc>(param: &PathAndJson<'rc>) -> BlockContext<'rc> {
     block
 }
 
+pub(crate) fn apply_wrapper(subject: String, wrapper: &str, wrap: bool) -> String {
+    if wrap {
+        format!("{}{}{}", wrapper, subject, wrapper)
+    } else {
+        subject
+    }
+}
+
 #[derive(Clone, Copy)]
 /// Concat helper for handlebars-rust
 ///
@@ -188,11 +196,7 @@ impl HelperDef for HandlebarsConcat {
                         param.value().render()
                     };
 
-                    let value = if quotes {
-                        format!("{}{}{}", quotation_mark, value, quotation_mark)
-                    } else {
-                        value
-                    };
+                    let value = apply_wrapper(value, quotation_mark, quotes);
 
                     if !value.is_empty() && (!output.contains(&value) || !distinct) {
                         output.push(value);
@@ -217,15 +221,11 @@ impl HelperDef for HandlebarsConcat {
 
                             rc.pop_block();
 
-                            if let Ok(out) = content.into_string() {
-                                let result = if quotes {
-                                    format!("{}{}{}", quotation_mark, out, quotation_mark)
-                                } else {
-                                    out
-                                };
+                            if let Ok(value) = content.into_string() {
+                                let value = apply_wrapper(value, quotation_mark, quotes);
 
-                                if !result.is_empty() && (!output.contains(&result) || !distinct) {
-                                    output.push(result);
+                                if !value.is_empty() && (!output.contains(&value) || !distinct) {
+                                    output.push(value);
                                 }
                             }
                         }
@@ -235,11 +235,7 @@ impl HelperDef for HandlebarsConcat {
                                 .iter()
                                 .map(|item| item.render())
                                 .map(|item| {
-                                    if quotes {
-                                        format!("{}{}{}", quotation_mark, item, quotation_mark)
-                                    } else {
-                                        item
-                                    }
+                                    apply_wrapper(item, quotation_mark, quotes)
                                 })
                                 .filter(|item| {
                                     if distinct {
@@ -271,15 +267,11 @@ impl HelperDef for HandlebarsConcat {
 
                             rc.pop_block();
 
-                            if let Ok(out) = content.into_string() {
-                                let result = if quotes {
-                                    format!("{}{}{}", quotation_mark, out, quotation_mark)
-                                } else {
-                                    out
-                                };
+                            if let Ok(value) = content.into_string() {
+                                let value = apply_wrapper(value, quotation_mark, quotes);
 
-                                if !result.is_empty() && (!output.contains(&result) || !distinct) {
-                                    output.push(result);
+                                if !value.is_empty() && (!output.contains(&value) || !distinct) {
+                                    output.push(value);
                                 }
                             }
                         }
@@ -291,11 +283,7 @@ impl HelperDef for HandlebarsConcat {
                                 .keys()
                                 .cloned()
                                 .map(|item| {
-                                    if quotes {
-                                        format!("{}{}{}", quotation_mark, item, quotation_mark)
-                                    } else {
-                                        item
-                                    }
+                                    apply_wrapper(item, quotation_mark, quotes)
                                 })
                                 .filter(|item| {
                                     if distinct {
