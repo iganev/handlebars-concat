@@ -234,9 +234,7 @@ impl HelperDef for HandlebarsConcat {
                             &mut ar
                                 .iter()
                                 .map(|item| item.render())
-                                .map(|item| {
-                                    apply_wrapper(item, quotation_mark, quotes)
-                                })
+                                .map(|item| apply_wrapper(item, quotation_mark, quotes))
                                 .filter(|item| {
                                     if distinct {
                                         !output.contains(item)
@@ -282,9 +280,7 @@ impl HelperDef for HandlebarsConcat {
                             &mut o
                                 .keys()
                                 .cloned()
-                                .map(|item| {
-                                    apply_wrapper(item, quotation_mark, quotes)
-                                })
+                                .map(|item| apply_wrapper(item, quotation_mark, quotes))
                                 .filter(|item| {
                                     if distinct {
                                         !output.contains(item)
