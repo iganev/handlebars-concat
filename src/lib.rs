@@ -153,12 +153,16 @@ impl HelperDef for HandlebarsConcat {
             ",".to_string()
         };
 
+        // filter output
         let distinct = h.hash_get("distinct").is_some();
 
+        // enable quotation marks wrapping
         let quotes = h.hash_get("quotes").is_some();
-        let single_quote = h.hash_get("single_quote").is_some(); // as a modifier on top of "quotes", switches to single quotation
 
-        let quotation_mark = if quotes {
+        // as a modifier on top of "quotes", switches to single quotation
+        let single_quote = h.hash_get("single_quote").is_some();
+
+        let wrapper = if quotes {
             if single_quote {
                 QUOTES_SINGLE
             } else {
@@ -196,7 +200,7 @@ impl HelperDef for HandlebarsConcat {
                         param.value().render()
                     };
 
-                    let value = apply_wrapper(value, quotation_mark, quotes);
+                    let value = apply_wrapper(value, wrapper, quotes);
 
                     if !value.is_empty() && (!output.contains(&value) || !distinct) {
                         output.push(value);
@@ -222,7 +226,7 @@ impl HelperDef for HandlebarsConcat {
                             rc.pop_block();
 
                             if let Ok(value) = content.into_string() {
-                                let value = apply_wrapper(value, quotation_mark, quotes);
+                                let value = apply_wrapper(value, wrapper, quotes);
 
                                 if !value.is_empty() && (!output.contains(&value) || !distinct) {
                                     output.push(value);
@@ -234,7 +238,7 @@ impl HelperDef for HandlebarsConcat {
                             &mut ar
                                 .iter()
                                 .map(|item| item.render())
-                                .map(|item| apply_wrapper(item, quotation_mark, quotes))
+                                .map(|item| apply_wrapper(item, wrapper, quotes))
                                 .filter(|item| {
                                     if distinct {
                                         !output.contains(item)
@@ -266,7 +270,7 @@ impl HelperDef for HandlebarsConcat {
                             rc.pop_block();
 
                             if let Ok(value) = content.into_string() {
-                                let value = apply_wrapper(value, quotation_mark, quotes);
+                                let value = apply_wrapper(value, wrapper, quotes);
 
                                 if !value.is_empty() && (!output.contains(&value) || !distinct) {
                                     output.push(value);
@@ -280,7 +284,7 @@ impl HelperDef for HandlebarsConcat {
                             &mut o
                                 .keys()
                                 .cloned()
-                                .map(|item| apply_wrapper(item, quotation_mark, quotes))
+                                .map(|item| apply_wrapper(item, wrapper, quotes))
                                 .filter(|item| {
                                     if distinct {
                                         !output.contains(item)
