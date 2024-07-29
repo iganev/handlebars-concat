@@ -10,8 +10,9 @@ String, Array and Object concatenator helper for [handlebars-rust](https://githu
 ## Quick Start
 
 Developed and tested with handlebars-rust v4.4.0.  
-Version `0.1.*` are compatible with handlebars `4`.  
-Version `0.2.*` are compatible with handlebars `5`. (Thanks to [campeis](https://github.com/campeis))
+Versions `0.1.*` are compatible with handlebars `4`.  
+Versions `0.2.*` are compatible with handlebars `5`. (Thanks to [campeis](https://github.com/campeis))
+Versions `0.3.*` are compatible with handlebars `6`.
 
 ### Registration
 
