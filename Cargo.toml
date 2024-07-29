@@ -17,7 +17,7 @@ name = "handlebars_concat"
 path = "src/lib.rs"
 
 [dependencies]
-handlebars = { version = "^6" }
+handlebars = { version = "6" }
 serde_json = { version = "^1" }
 
 [badges]
